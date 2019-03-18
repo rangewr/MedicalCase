@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>testVue</title>
+</head>
+<body>
+<div class="container" id="app">
+
+    <div class="vue-login-div ">
+        <table border="0" style="margin: 0px auto;">
+            <tr>
+                <td width="50" align="center" style="color: #fff;">账 号 :</td>
+                <td><input type="text" v-model="username" class="vue-input" placeholder="用户名"></td>
+            </tr>
+            <tr>
+                <td><br></td>
+            </tr>
+            <tr>
+                <td width="50" align="center" style="color: #fff;">密 码 :</td>
+                <td><input type="password" v-model="pwd" class="vue-input" placeholder="密码"></td>
+            </tr>
+            <tr>
+                <td><br></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    <button class="vue-login-btn vue-btn-warning" @click="btn_login()">登录</button>
+                </td>
+            </tr>
+        </table>
+
+    </div>
+
+</div>
+</body>
+
+
+<script type="text/javascript" src="/static/js/vue.min.js"></script>
+<script type="text/javascript" src="/static/js/vue-resource.js"></script>
+<script type="text/javascript" src="/static/js/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="/static/js/popmsg.js"></script>
+<script type="text/javascript" src="/static/js/showTips.js"></script>
+<script type="text/javascript" src="/static/js/axios.js"></script>
+<script>
+    // import axios from "axios";
+    // import qs from "qs";
+
+    new Vue({
+        delimiters: ['${', '}'],//修改vue的占位符设置,默认是双{},与beego冲突
+        el: "#app",
+        data() {
+            return {
+                username: "q",//用户名
+                pwd: "q",//密码
+            }
+        },
+        methods: {
+            btn_login() {
+                if (this.username == "" || this.pwd == "") {
+                    showTips("请输入用户名/密码!", "error");
+                } else {
+
+                    // $.ajax({
+                    //     type: "post",
+                    //     url: "http://localhost:8080/static/src/infoManage.html",
+                    //     success: function(html) {
+                    //
+                    //         console.log(html);
+                    //         // $('.mainbox').html(html);
+                    //     }
+                    // });
+
+
+                    var url = "/illness/GetDepartmentList";
+                    axios.get(url, {
+                        params: {
+                            hospitalId: 1
+                        }
+                    }).then(res => {
+                        if (res.data.ErrCode == 0) {
+                            showTips("登录成功!", "success");
+                            var path = window.location.href;
+                            setTimeout(function()
+                            {
+                                window.location.href = path + "static/src/menuIframe.html"
+                            }
+                        ,
+                            1000
+                        )
+                        } else {
+                            showTips(res.data.ErrMsg);
+                        }
+                        showTips("登录成功!", "success");
+                    }).catch(error => {
+                        console.log("登录异常!");
+                        console.log(error);
+                    });
+                }
+            },
+            keyup(event) {
+                console.log(event);
+                if (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 13) return;
+                var url = "/TestRouter";
+                this.$http.jsonp(url, {
+                    params: {
+                        wd: this.wd
+                    },
+                    jsonp: 'cb'
+                }).then(res => {
+
+                    console.log("url-res");
+                    console.log(res);
+                    this.arr = res.data.s;//把百度服务器返回的数据传给arr数组
+                    console.log("this.arr");
+                    console.log(this.arr);
+                })
+            },
+            //监听鼠标的点击事件
+            //如果鼠标点击某一行的文字，则点击事件中的event.explicitOriginalTarget.data代表关键词
+            //如果点击某一行的空白处，则点击事件中的event.explicitOriginalTarget.innerText代表关键词
+            //大家可以通过console.log(event)来查看关键词所在的位置
+            click(event) {
+                console.log(event);
+                if (event.explicitOriginalTarget.data != undefined) {
+                    this.wd = event.explicitOriginalTarget.data;
+                    window.open("https://www.baidu.com/s?wd=" + this.wd);
+                } else if (event.explicitOriginalTarget.innerText != undefined) {
+                    this.wd = event.explicitOriginalTarget.innerText;
+                    window.open("https://www.baidu.com/s?wd=" + this.wd);
+                }
+            },
+            //监听键盘的事件
+            //如果按down，则增加当前listIndex+1，因此arr[this.listIndex]就能代表当前的词条
+            //我们通过对listIndex的修改来得到当前词条在arr中的索引，然后就可以得到词条的具体信息，然后发送请求了
+            keydown(event) {
+                console.log(event);
+                //下键：40 上键：38
+                if (event.keyCode == 38) {
+                    //按的上键
+                    this.listIndex--;
+                    if (this.listIndex < 0) {
+                        this.listIndex = this.arr.length - 1;
+                    }
+                    this.wd = this.arr[this.listIndex];
+                } else if (event.keyCode == 40) {
+                    //说明你按的是下键
+                    this.listIndex++;
+                    if (this.listIndex > this.arr.length - 1) {
+                        this.listIndex = 0;
+                    }
+                    this.wd = this.arr[this.listIndex];
+                } else if (event.keyCode == 13) {
+                    //如果你按的是enter，那么就跳转到百度搜索结果
+                    window.open("https://www.baidu.com/s?wd=" + this.wd);
+                }
+
+            }
+        }
+    });
+
+</script>
+
+
+<style>
+    body {
+        background: url("/static/img/login_back.jpg") no-repeat center 0;
+    }
+
+    /*input输入框*/
+    .vue-input {
+        display: inline-block;
+        width: 200px;
+        height: 30px;
+        line-height: 1.2;
+        padding: 4px 7px;
+        font-size: 12px;
+        border: 1px solid #dddee1;
+        border-radius: 4px;
+        color: #fff;
+        background-color: transparent;
+        background-image: none;
+        position: relative;
+        cursor: text;
+    }
+
+    .vue-input:hover {
+        border-color: #57a3f3;
+    }
+
+
+    input::-webkit-input-placeholder {
+        /* placeholder颜色  */
+        color: #aaa;
+        /* placeholder字体大小  */
+        font-size: 12px;
+        /* placeholder位置  */
+        text-align: left;
+    }
+
+    .vue-login-btn {
+        display: inline-block;
+        margin-bottom: 0;
+        font-weight: 400;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 1.5;
+        width: 100%;
+        border: 1px solid transparent;
+        padding: 6px 15px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+
+    .vue-btn-warning {
+        height: 35px;
+        color: #fff;
+        background-color: orange;
+        border-color: #2d8cf0;
+    }
+
+    .vue-login-div {
+        height: 300px;
+        width: 500px;
+        margin: 300px auto;
+        border: 0px solid orange;
+    }
+</style>
+</body>
+</html>

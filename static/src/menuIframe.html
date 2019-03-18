@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>testVue</title>
+</head>
+<body>
+<div class="containerDiv" id="app">
+
+    <div class="vue-login-div ">
+        <ul>
+
+            <li><A class="hover" href="infoTable.html" target="myFrame">前端交流</A></li>
+
+            <li><A href="addQuery.html" target="myFrame">交互设计</A></li>
+
+            <li><A href="#">视觉设计</A></li>
+
+            <li><A href="#">用户研究</A></li>
+
+            <li><A href="#">设计茶吧</A></li>
+
+            <li><A href="#">前端交流</A></li>
+
+            <li><A href="#">团队生活</A></li>
+
+            <div id="lanPos"></div>
+
+        </ul>
+    </div>
+    <div class="iframeDiv">
+        <iframe src="http://localhost:8080/static/src/infoTable.html" frameborder="0" style="width: 100%; height: 100%;"
+                scrolling="no" name="myFrame"></iframe>
+    </div>
+</div>
+</body>
+
+
+<script type="text/javascript" src="/static/js/vue.min.js"></script>
+<script type="text/javascript" src="/static/js/vue-resource.js"></script>
+<script type="text/javascript" src="/static/js/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="/static/js/popmsg.js"></script>
+<script type="text/javascript" src="/static/js/leftMenu.js"></script>
+<script type="text/javascript" src="/static/js/showTips.js"></script>
+<script type="text/javascript" src="/static/js/axios.js"></script>
+<script>
+    // import axios from "axios";
+    // import qs from "qs";
+
+    new Vue({
+        delimiters: ['${', '}'],//修改vue的占位符设置,默认是双{},与beego冲突
+        el: "#app",
+        data() {
+            return {
+                username: "",//用户名
+                pwd: "",//密码
+            }
+        },
+        methods: {
+            btn_login() {
+                if (this.username == "" || this.pwd == "") {
+                    showTips("请输入用户名/密码!", "error");
+                } else {
+                    var url = "/illness/GetDepartmentList";
+                    axios.get(url, {
+                        params: {
+                            hospitalId: 1
+                        }
+                    }).then(res => {
+                        if (res.data.ErrCode == 0) {
+                            showTips("登录成功!", "success");
+                            window.location.href = "http://www.baidu.com";
+                        } else {
+                            showTips(res.data.ErrMsg);
+                        }
+                        showTips("登录成功!", "success");
+                    }).catch(error => {
+                        console.log("登录异常!");
+                        console.log(error);
+                    });
+                }
+            },
+
+        },
+    });
+
+</script>
+
+
+<style>
+    body {
+        height: 100%;
+        background-color: #bbb;
+    }
+
+    /*input输入框*/
+    .vue-input {
+        display: inline-block;
+        width: 200px;
+        height: 30px;
+        line-height: 1.2;
+        padding: 4px 7px;
+        font-size: 12px;
+        border: 1px solid #dddee1;
+        border-radius: 4px;
+        color: #fff;
+        background-color: transparent;
+        background-image: none;
+        position: relative;
+        cursor: text;
+    }
+
+    .vue-input:hover {
+        border-color: #57a3f3;
+    }
+
+
+    input::-webkit-input-placeholder {
+        /* placeholder颜色  */
+        color: #aaa;
+        /* placeholder字体大小  */
+        font-size: 12px;
+        /* placeholder位置  */
+        text-align: left;
+    }
+
+    .vue-login-btn {
+        display: inline-block;
+        margin-bottom: 0;
+        font-weight: 400;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 1.5;
+        width: 100%;
+        border: 1px solid transparent;
+        padding: 6px 15px;
+        font-size: 12px;
+        border-radius: 4px;
+    }
+
+    .vue-btn-warning {
+        height: 35px;
+        color: #fff;
+        background-color: orange;
+        border-color: #2d8cf0;
+    }
+
+    .vue-login-div {
+        float: left;
+        display: inline;
+        width: 230px;
+        /* margin: 300px auto; */
+        /* margin-left: -150px; */
+        border: 0px solid orange;
+    }
+
+    .containerDiv {
+        width: 100%;
+        float: left;
+        /*border: 1px solid red;*/
+        height: 99.8vh;
+        display: inline-flex;
+    }
+
+    .iframeDiv {
+        display: inline-block;
+        width: 100%;
+
+    }
+</style>
+
+<link rel="stylesheet" href="/static/css/menu.css"/>
+</body>
+</html>

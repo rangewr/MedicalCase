@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>testVue</title>
+</head>
+<script type="text/javascript" src="/static/js/vue.min.js"></script>
+<script type="text/javascript" src="/static/js/vue-resource.js"></script>
+<script type="text/javascript" src="/static/js/jquery-1.10.2.js"></script>
+<script type="text/javascript" src="/static/js/popmsg.js"></script>
+<script type="text/javascript" src="/static/js/showTips.js"></script>
+<script type="text/javascript" src="/static/js/axios.js"></script>
+<body>
+<div id="app">
+    <Table v-for="data00 in data1">
+        <tr v-for="tdcolumns in data00">
+            <td>${tdcolumns.Id}</td>
+        </tr>
+    </Table>
+</div>
+</body>
+
+
+<script>
+    // import axios from "axios";
+    // import qs from "qs";
+
+    new Vue({
+        delimiters: ['${', '}'],//修改vue的占位符设置,默认是双{},与beego冲突
+        el: "#app",
+        data() {
+            return {
+                username: "",//用户名
+                pwd: "",//密码
+                data1: [
+                    {
+                        Id: 1,
+                        Update_time: "2018-09-06 03:12:56",
+                        Hospital_name: "维康医院",
+                    }, {
+                        Id: 1,
+                        Update_time: "2018-09-06 03:12:56",
+                        Hospital_name: "维康医院",
+                    }, {
+                        Id: 1,
+                        Update_time: "2018-09-06 03:12:56",
+                        Hospital_name: "维康医院",
+                    },
+                ],//表格数据
+                columns: [
+                    {
+                        title: '病例编号',
+                        key: 'Id'
+                    },
+                    {
+                        title: '操作时间',
+                        key: 'Update_time'
+                    },
+                    {
+                        title: '体检单位',
+                        key: 'Hospital_name'
+                    },
+                    {
+                        title: '操作',
+                        key: 'action',
+                        width: 170,
+                        align: 'center',
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'success',
+                                        size: 'small'
+                                    },
+                                    style: {
+                                        marginRight: '5px'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.viewDetail(params.index)
+                                        }
+                                    }
+                                }, '详情'),
+                                h('Button', {
+                                    props: {
+                                        type: 'error',
+                                        size: 'small'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            this.delCase(params.index)
+                                        }
+                                    }
+                                }, '删除')
+                            ]);
+                        }
+                    }
+                ],
+            }
+        },
+        methods: {
+            btn_login() {
+                if (this.username == "" || this.pwd == "") {
+                    showTips("请输入用户名/密码!", "error");
+                } else {
+                    var url = "/illness/GetDepartmentList";
+                    axios.get(url, {
+                        params: {
+                            hospitalId: 1
+                        }
+                    }).then(res => {
+                        if (res.data.ErrCode == 0) {
+                            showTips("登录成功!", "success");
+                            window.location.href = "http://www.baidu.com";
+                        } else {
+                            showTips(res.data.ErrMsg);
+                        }
+                        showTips("登录成功!", "success");
+                    }).catch(error => {
+                        console.log("登录异常!");
+                        console.log(error);
+                    });
+                }
+            },
+
+        },
+    });
+
+</script>
+
+
+<style>
+
+</style>
+</body>
+</html>
